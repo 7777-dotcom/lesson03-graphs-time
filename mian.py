@@ -81,9 +81,40 @@ st.plotly_chart(fig2, use_container_width=True)
 st.info("📌 이 그래프로 알 수 있는 것: (여기에 문구를 입력하세요)")
 
 # ==============================================================
-# 구역 3. (다음 그래프를 추가할 구역)
+# 구역 3. 날짜별 10위권 총 관객수
 # ==============================================================
-st.header("3. (다음 그래프 추가 예정)")
-st.write("여기에 새로운 그래프를 추가할 예정입니다.")
+st.header("3. 날짜별 10위권 총 관객수")
 
-# st.info("📌 이 그래프로 알 수 있는 것: (여기에 문구를 입력하세요)")
+daily_total = df.groupby("날짜")["일관객"].sum().reset_index()
+daily_total.columns = ["날짜", "총관객"]
+
+# 총관객이 가장 컸던 상위 3일
+top3_days = daily_total.sort_values("총관객", ascending=False).head(3)
+
+fig3 = px.area(
+    daily_total,
+    x="날짜",
+    y="총관객",
+    title="날짜별 박스오피스 10위권 총 관객수",
+    labels={"날짜": "날짜", "총관객": "10위권 총 관객수"},
+)
+fig3.update_traces(
+    hovertemplate="날짜: %{x|%Y-%m-%d}<br>총 관객수: %{y:,}명<extra></extra>"
+)
+fig3.update_layout(hovermode="x unified")
+
+# 상위 3일 표시 (점 + 날짜 라벨)
+fig3.add_scatter(
+    x=top3_days["날짜"],
+    y=top3_days["총관객"],
+    mode="markers+text",
+    marker=dict(size=12, color="red", symbol="star"),
+    text=top3_days["날짜"].dt.strftime("%Y-%m-%d"),
+    textposition="top center",
+    name="총관객 최고 3일",
+    hovertemplate="날짜: %{x|%Y-%m-%d}<br>총 관객수: %{y:,}명<extra></extra>",
+)
+
+st.plotly_chart(fig3, use_container_width=True)
+
+st.info("📌 이 그래프로 알 수 있는 것: (여기에 문구를 입력하세요)")
