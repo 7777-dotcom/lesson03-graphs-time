@@ -149,3 +149,36 @@ fig4.update_layout(yaxis=dict(categoryorder="total ascending"))
 st.plotly_chart(fig4, use_container_width=True)
 
 st.info("📌 이 그래프로 알 수 있는 것: (여기에 문구를 입력하세요)")
+
+# ==============================================================
+# 구역 5. 월 x 요일별 일관객 합계 히트맵
+# ==============================================================
+st.header("5. 월 x 요일별 일관객 합계 히트맵")
+
+heatmap_df = df.copy()
+heatmap_df["월"] = heatmap_df["날짜"].dt.month
+weekday_order = ["월", "화", "수", "목", "금", "토", "일"]
+weekday_map = dict(zip(range(7), weekday_order))
+heatmap_df["요일"] = heatmap_df["날짜"].dt.dayofweek.map(weekday_map)
+
+pivot = (
+    heatmap_df.pivot_table(index="요일", columns="월", values="일관객", aggfunc="sum")
+    .reindex(weekday_order)
+)
+
+fig5 = px.imshow(
+    pivot,
+    color_continuous_scale="Reds",
+    labels=dict(x="월", y="요일", color="일관객 합계"),
+    aspect="auto",
+    title="월 x 요일별 일관객 합계",
+)
+fig5.update_xaxes(dtick=1, title="월")
+fig5.update_yaxes(title="요일")
+fig5.update_traces(
+    hovertemplate="요일: %{y}<br>월: %{x}월<br>일관객 합계: %{z:,}명<extra></extra>"
+)
+
+st.plotly_chart(fig5, use_container_width=True)
+
+st.info("📌 이 그래프로 알 수 있는 것: (여기에 문구를 입력하세요)")
