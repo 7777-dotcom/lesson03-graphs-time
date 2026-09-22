@@ -118,3 +118,34 @@ fig3.add_scatter(
 st.plotly_chart(fig3, use_container_width=True)
 
 st.info("📌 이 그래프로 알 수 있는 것: (여기에 문구를 입력하세요)")
+
+# ==============================================================
+# 구역 4. 일관객 합계 TOP 10 영화
+# ==============================================================
+st.header("4. 일관객 합계 TOP 10 영화")
+
+movie_stats = (
+    df.groupby("영화명")
+    .agg(총관객=("일관객", "sum"), 순위권진입일수=("날짜", "count"))
+    .reset_index()
+)
+
+top10_total = movie_stats.sort_values("총관객", ascending=False).head(10)
+
+fig4 = px.bar(
+    top10_total,
+    x="총관객",
+    y="영화명",
+    orientation="h",
+    title="이 기간 일관객 합계 TOP 10 영화",
+    labels={"총관객": "일관객 합계", "영화명": "영화명"},
+    custom_data=["순위권진입일수"],
+)
+fig4.update_traces(
+    hovertemplate="%{y}<br>일관객 합계: %{x:,}명<br>10위권 진입 일수: %{customdata[0]}일<extra></extra>"
+)
+fig4.update_layout(yaxis=dict(categoryorder="total ascending"))
+
+st.plotly_chart(fig4, use_container_width=True)
+
+st.info("📌 이 그래프로 알 수 있는 것: (여기에 문구를 입력하세요)")
